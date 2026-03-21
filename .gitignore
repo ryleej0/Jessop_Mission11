@@ -1,0 +1,30 @@
+# Build output
+bin/
+obj/
+
+# IDE / Editor
+.idea/
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+dist/
+dist-ssr/
+
+# Logs
+*.log
+
+# Local env
+*.local
+
+# IMPORTANT: Do NOT ignore .sqlite files — the database must be in the repo
+# so that TAs can clone and run the project immediately
