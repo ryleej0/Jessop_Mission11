@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Bookstore.API.Controllers;
 
 // API controller for managing book data.
-// Provides a GET endpoint with server-side pagination and sorting by title.
+// Provides endpoints for paginated/sorted/filtered book listing and distinct category retrieval.
 [Route("api/[controller]")]
 [ApiController]
 public class BooksController : ControllerBase
@@ -17,15 +17,22 @@ public class BooksController : ControllerBase
         _context = context;
     }
 
-    // GET: api/books?pageNumber=1&pageSize=5&sortOrder=asc
-    // Returns a paginated, sorted list of books along with metadata for the frontend pagination controls.
+    // GET: api/books?pageNumber=1&pageSize=5&sortOrder=asc&category=Fiction
+    // Returns a paginated, sorted, and optionally filtered list of books with pagination metadata.
     [HttpGet]
     public async Task<IActionResult> GetBooks(
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 5,
-        [FromQuery] string sortOrder = "asc")
+        [FromQuery] string sortOrder = "asc",
+        [FromQuery] string? category = null)
     {
         var query = _context.Books.AsQueryable();
+
+        // Filter by category if provided (exact match)
+        if (!string.IsNullOrEmpty(category))
+        {
+            query = query.Where(b => b.Category == category);
+        }
 
         // Sort by title — ascending by default, descending if requested
         query = sortOrder.ToLower() == "desc"
@@ -51,5 +58,19 @@ public class BooksController : ControllerBase
             currentPage = pageNumber,
             pageSize
         });
+    }
+
+    // GET: api/books/categories
+    // Returns a sorted list of distinct book categories for the filter dropdown.
+    [HttpGet("categories")]
+    public async Task<IActionResult> GetCategories()
+    {
+        var categories = await _context.Books
+            .Select(b => b.Category)
+            .Distinct()
+            .OrderBy(c => c)
+            .ToListAsync();
+
+        return Ok(categories);
     }
 }

@@ -20,3 +20,9 @@ export interface BooksResponse {
   currentPage: number;
   pageSize: number;
 }
+
+// Represents a single item in the shopping cart
+export interface CartItem {
+  book: Book;
+  quantity: number;
+}
