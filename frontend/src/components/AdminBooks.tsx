@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Book } from '../types/Book';
+import { fetchBooks as apiFetchBooks, addBook, updateBook, deleteBook } from '../api/booksApi';
 
 // Empty book template used to reset the form when adding a new book
 const emptyBook: Omit<Book, 'bookID'> = {
@@ -24,11 +25,10 @@ function AdminBooks() {
   const navigate = useNavigate();
 
   // Fetch all books (unpaginated) for the admin table
-  const fetchBooks = async () => {
+  const fetchAllBooks = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/books?pageSize=1000');
-      const data = await res.json();
+      const data = await apiFetchBooks(1000, 1, 'asc');
       setBooks(data.books);
     } catch (err) {
       console.error('Failed to fetch books:', err);
@@ -38,7 +38,7 @@ function AdminBooks() {
   };
 
   useEffect(() => {
-    fetchBooks();
+    fetchAllBooks();
   }, []);
 
   // Update form state when an input field changes
@@ -88,21 +88,13 @@ function AdminBooks() {
 
     try {
       if (editingBook) {
-        await fetch(`/api/books/${editingBook.bookID}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...formData, bookID: editingBook.bookID }),
-        });
+        await updateBook(editingBook.bookID, { ...formData, bookID: editingBook.bookID });
       } else {
-        await fetch('/api/books', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
-        });
+        await addBook(formData);
       }
 
       handleCancel();
-      await fetchBooks();
+      await fetchAllBooks();
     } catch (err) {
       console.error('Failed to save book:', err);
     }
@@ -113,8 +105,8 @@ function AdminBooks() {
     if (!window.confirm('Are you sure you want to delete this book?')) return;
 
     try {
-      await fetch(`/api/books/${bookID}`, { method: 'DELETE' });
-      await fetchBooks();
+      await deleteBook(bookID);
+      await fetchAllBooks();
     } catch (err) {
       console.error('Failed to delete book:', err);
     }
