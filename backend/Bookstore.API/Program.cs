@@ -12,12 +12,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<BookstoreContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("BookstoreConnection")));
 
-// Configure CORS to allow requests from the React frontend dev servers
+// Configure CORS to allow requests from the React frontend (local dev and Azure deployment)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "http://localhost:5173")
+        policy.AllowAnyOrigin()
             .AllowAnyHeader()
             .AllowAnyMethod();
     });

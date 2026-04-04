@@ -94,7 +94,12 @@ function BookList() {
 
   return (
     <div className="container my-4">
-      <h1 className="mb-4">Bookstore</h1>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h1 className="mb-0">Bookstore</h1>
+        <button className="btn btn-outline-secondary" onClick={() => navigate('/adminbooks')}>
+          Manage Books
+        </button>
+      </div>
 
       {/* Bootstrap Grid: main content (col-md-9) + cart summary sidebar (col-md-3) */}
       <div className="row">
