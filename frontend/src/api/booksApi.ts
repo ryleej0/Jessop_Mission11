@@ -1,7 +1,7 @@
 // Base URL for the backend API.
 // In development, this is empty so requests go through the Vite proxy (vite.config.ts).
 // In production, this points to the deployed Azure backend.
-const API_URL = import.meta.env.VITE_API_URL || '';
+const API_URL = import.meta.env.VITE_API_URL || 'https://bookstore-jessop-backend-ajegcsgmabdabchf.eastus-01.azurewebsites.net';
 
 // Fetches a paginated, sorted, and optionally filtered list of books
 export const fetchBooks = async (
