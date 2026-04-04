@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { Book, BooksResponse } from '../types/Book';
+import type { Book } from '../types/Book';
 import { useCart } from '../context/CartContext';
+import { fetchBooks as apiFetchBooks, fetchCategories as apiFetchCategories } from '../api/booksApi';
 
 // Main bookstore page: displays a paginated, sortable, filterable list of books
 // with Add to Cart functionality and a cart summary sidebar.
@@ -25,46 +26,22 @@ function BookList() {
 
   // Fetch the list of distinct categories on mount for the filter dropdown
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch('/api/books/categories');
-        const data: string[] = await res.json();
-        setCategories(data);
-      } catch (err) {
-        console.error('Failed to fetch categories:', err);
-      }
-    };
-    fetchCategories();
+    apiFetchCategories()
+      .then((data) => setCategories(data))
+      .catch((err) => console.error('Failed to fetch categories:', err));
   }, []);
 
   // Fetch books whenever page, page size, sort order, or category filter changes
   useEffect(() => {
-    const fetchBooks = async () => {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams({
-          pageNumber: currentPage.toString(),
-          pageSize: pageSize.toString(),
-          sortOrder,
-        });
-        if (selectedCategory) {
-          params.set('category', selectedCategory);
-        }
-
-        const res = await fetch(`/api/books?${params}`);
-        const data: BooksResponse = await res.json();
-
+    setLoading(true);
+    apiFetchBooks(pageSize, currentPage, sortOrder, selectedCategory || undefined)
+      .then((data) => {
         setBooks(data.books);
         setTotalPages(data.totalPages);
         setTotalCount(data.totalCount);
-      } catch (err) {
-        console.error('Failed to fetch books:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBooks();
+      })
+      .catch((err) => console.error('Failed to fetch books:', err))
+      .finally(() => setLoading(false));
   }, [currentPage, pageSize, sortOrder, selectedCategory]);
 
   // Reset to page 1 when page size changes to avoid out-of-range pages
