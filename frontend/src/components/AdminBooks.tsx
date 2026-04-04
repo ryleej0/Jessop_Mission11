@@ -79,15 +79,21 @@ function AdminBooks() {
     setFormData(emptyForm);
   };
 
-  // Submit the form — calls POST for new books or PUT for existing ones
+  // Submit the form — converts string values to numbers before sending to the API
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const bookData = {
+      ...formData,
+      pageCount: Number(formData.pageCount),
+      price: Number(formData.price),
+    };
+
     try {
       if (editingBook) {
-        await updateBook(editingBook.bookID, { ...formData, bookID: editingBook.bookID });
+        await updateBook(editingBook.bookID, { ...bookData, bookID: editingBook.bookID });
       } else {
-        await addBook(formData);
+        await addBook(bookData);
       }
 
       handleCancel();
