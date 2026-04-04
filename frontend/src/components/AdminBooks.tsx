@@ -3,16 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import type { Book } from '../types/Book';
 import { fetchBooks as apiFetchBooks, addBook, updateBook, deleteBook } from '../api/booksApi';
 
-// Empty book template used to reset the form when adding a new book
-const emptyBook: Omit<Book, 'bookID'> = {
+// Empty form template — price and pageCount are strings so the user can freely type decimals
+const emptyForm = {
   title: '',
   author: '',
   publisher: '',
   isbn: '',
   classification: '',
   category: '',
-  pageCount: 0,
-  price: 0,
+  pageCount: '',
+  price: '',
 };
 
 // Admin page for managing books — supports adding, editing, and deleting books.
@@ -20,7 +20,7 @@ function AdminBooks() {
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingBook, setEditingBook] = useState<Book | null>(null);
-  const [formData, setFormData] = useState(emptyBook);
+  const [formData, setFormData] = useState(emptyForm);
   const [showForm, setShowForm] = useState(false);
   const navigate = useNavigate();
 
@@ -41,13 +41,10 @@ function AdminBooks() {
     fetchAllBooks();
   }, []);
 
-  // Update form state when an input field changes
+  // Update form state when an input field changes — all values stored as strings while typing
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === 'pageCount' || name === 'price' ? Number(value) : value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   // Open the form pre-filled for editing an existing book
@@ -60,8 +57,8 @@ function AdminBooks() {
       isbn: book.isbn,
       classification: book.classification,
       category: book.category,
-      pageCount: book.pageCount,
-      price: book.price,
+      pageCount: book.pageCount.toString(),
+      price: book.price.toString(),
     });
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -70,7 +67,7 @@ function AdminBooks() {
   // Open a blank form for adding a new book
   const handleAddNew = () => {
     setEditingBook(null);
-    setFormData(emptyBook);
+    setFormData(emptyForm);
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -79,7 +76,7 @@ function AdminBooks() {
   const handleCancel = () => {
     setShowForm(false);
     setEditingBook(null);
-    setFormData(emptyBook);
+    setFormData(emptyForm);
   };
 
   // Submit the form — calls POST for new books or PUT for existing ones
