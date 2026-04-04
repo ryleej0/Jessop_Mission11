@@ -1,13 +1,15 @@
 import { Routes, Route } from 'react-router-dom';
 import BookList from './components/BookList';
 import CartPage from './components/CartPage';
+import AdminBooks from './components/AdminBooks';
 
-// Main App component — defines routes for the book list (home) and cart pages
+// Main App component — defines routes for the book list, cart, and admin pages
 function App() {
   return (
     <Routes>
       <Route path="/" element={<BookList />} />
       <Route path="/cart" element={<CartPage />} />
+      <Route path="/adminbooks" element={<AdminBooks />} />
     </Routes>
   );
 }
